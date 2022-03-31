@@ -1,0 +1,68 @@
+create table fact_metrics_aggr
+(
+report_dt date,
+account_id bigint,
+metric_id int,
+value_currentmonth decimal(20,2),
+value_last_month decimal(20,2),
+value_last_3months decimal(20,2),
+value_lifetime decimal(20,2),
+dw_ins_upd_dt datetime,
+session_name varchar(100)
+);
+
+insert into fact_metrics_aggr VALUES 
+(current_DATE, 1, 1, 10, 20, 30, 50, current_timestamp, 'TEMP'),
+(current_DATE, 1, 2, 5, 10, 15, 30, current_timestamp, 'TEMP'),
+(current_DATE, 1, 3, 100, 10, 200, 300, current_timestamp, 'TEMP'),
+(current_DATE, 1, 4, 100, 10, 100, 300, current_timestamp, 'TEMP'),
+(current_DATE, 1, 5, 100, 10, 32, 400, current_timestamp, 'TEMP'),
+(current_DATE, 1, 6, 100, 10, 53, 100, current_timestamp, 'TEMP'),
+(current_DATE, 1, 7, 50, 10, 23, 150, current_timestamp, 'TEMP'),
+(current_DATE, 1, 8, 30, 10, 53, 180, current_timestamp, 'TEMP'),
+(current_DATE, 1, 9, 0, 10, 25, 210, current_timestamp, 'TEMP'),
+(current_DATE, 1, 10, 1, 10, 150, 320, current_timestamp, 'TEMP'),
+(current_DATE, 1, 11, 2, 10, 2, 10, current_timestamp, 'TEMP'),
+(current_DATE, 2, 1, 10, 20, 30, 50, current_timestamp, 'TEMP');
+
+
+create table if not exists dim_metrics (metric_id integer primary key, 
+                                             metric_name varchar(100), 
+                                             return_type varchar(20), 
+                                             dw_ins_upd_dt datetime);
+
+Insert into dim_metrics (metric_id, metric_name, return_type, dw_ins_upd_dt)
+select 
+	metric_id, metric_name, return_type, dw_ins_upd_dt
+from 
+(
+	select 1 as metric_id, 'Deposit Amount' as metric_name, 'Amount' as return_type, current_timestamp as dw_ins_upd_dt
+	union 
+	select 2, 'Average Deposit Amount', 'Amount', current_timestamp
+	union 
+	select 3, 'Bonus Amount', 'Amount', current_timestamp
+	union 
+	select 4, 'Free Rounds Played', 'Count', current_timestamp
+	union 
+	select 5, 'Bonus', 'Percentage', current_timestamp
+	union 
+	select 6, 'Withdrawal Amount', 'Amount', current_timestamp
+	union 
+	select 7, '# Of Withdrawals', 'Count', current_timestamp
+	union 
+	select 8, 'Pending Withdrawals', 'Count', current_timestamp
+	union 
+	select 9, 'Average Bet', 'Amount', current_timestamp
+	union 
+	select 10, 'GGR', 'Amount', current_timestamp
+	union 
+	select 11, 'NGR', 'Amount', current_timestamp
+) rs
+where not exists (select 1 from dim_metrics a where a.metric_id = rs.metric_id); 
+
+
+create table if not exists tokens(
+  token varchar(255)
+);
+
+insert into tokens(token) values ('c0e49d813e6f204bdcfa3e71442aa6a4cd8bc3cd36841257bc94104b9f10f071e8399bfaa116de536ebe02221caa5fd4')

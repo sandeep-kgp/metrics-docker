@@ -1,0 +1,48 @@
+version: '3.4'
+
+x-app: &default-settings
+  env_file: .env_local
+
+services:
+  server:
+    build:
+      dockerfile: Dockerfile
+      context: ./metrics-server
+    environment:
+      LOG_FOLDER: '/var/log/metrics-server'
+    <<: *default-settings
+    volumes:
+      - app-logs:/var/log/metrics-server
+    ports:
+      - '8001:8000'
+    depends_on:
+      - db
+
+  db:
+    image: mysql:5.7
+    restart: always
+    container_name: mysql_container
+    environment:
+      MYSQL_DATABASE: 'alert'
+      MYSQL_USER: 'emailer'
+      MYSQL_PASSWORD: 'emailer'
+      MYSQL_ROOT_PASSWORD: 'Aw,tgey#wuibYM'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - my-db:/var/lib/mysql
+
+volumes:
+  app-logs:
+    driver_opts:
+      type: none
+      device: $PWD/logs
+      o: bind
+
+  my-db:
+    driver_opts:
+      type: none
+      device: $PWD/db
+      o: bind

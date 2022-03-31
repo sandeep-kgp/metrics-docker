@@ -1,0 +1,19 @@
+{
+  "name": "alert-server",
+  "version": "1.0.0",
+  "description": "API for server calls",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node app.js"
+  },
+  "author": "Sandeep",
+  "license": "ISC",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "express": "^4.17.1",
+    "lodash": "^4.17.21",
+    "mysql2": "^2.3.3",
+    "path": "^0.12.7"
+  }
+}

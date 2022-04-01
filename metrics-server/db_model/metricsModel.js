@@ -40,8 +40,24 @@ const fetchTopFavGames = async(accountId) => {
   let client
   try {
     client = await db.getConnection()
-    const sql = 'SELECT game_name as top_5_fav_games FROM f_bo_segment_kpis_aggr'
-      + ' WHERE metric_id = 12 AND account_id = ? ORDER BY total_bets DESC'
+    const sql = 'SELECT segment_name as expired_bonuses FROM f_bo_segment_kpis_aggr'
+      + ' WHERE metric_id = 12 AND account_id = ? ORDER BY count DESC'
+    const [data, fields]= await client.query(sql, [accountId])
+    return data
+  } catch (e) {
+    console.error(e)
+    throw e
+  } finally {
+    // client.release()
+  }
+}
+
+const fetchExpiredBonuses = async(accountId) => {
+  let client
+  try {
+    client = await db.getConnection()
+    const sql = 'SELECT segment_name as bonus_name, amount as expired_bonus FROM f_bo_segment_kpis_aggr'
+      + ' WHERE metric_id = 13 AND account_id = ? ORDER BY amount DESC'
     const [data, fields]= await client.query(sql, [accountId])
     return data
   } catch (e) {
@@ -55,5 +71,6 @@ const fetchTopFavGames = async(accountId) => {
 module.exports = {
   fetchUserTransactions,
   fetchPlayerLastGame,
-  fetchTopFavGames
+  fetchTopFavGames,
+  fetchExpiredBonuses
 }
